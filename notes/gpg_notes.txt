@@ -24,18 +24,19 @@ some other action (type on the keyboard, move the mouse, utilize the
 disks) during the prime generation; this gives the random number
 generator a better chance to gain enough entropy.
 
-gpg: key 4205570A marked as ultimately trusted
+gpg: key xxxxxxxx marked as ultimately trusted
 gpg: directory '/home/user/.gnupg/openpgp-revocs.d' created
-gpg: revocation certificate stored as '/home/user/.gnupg/openpgp-revocs.d/6B97B196A7370899334C31C8163C49164205570A.rev'
+gpg: revocation certificate stored as
+'/home/user/.gnupg/openpgp-revocs.d/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.rev'
 public and secret key created and signed.
 
 gpg: checking the trustdb
 gpg: marginals needed: 3  completes needed: 1  trust model: PGP
 gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
 pub   rsa2048/4205570A 2016-03-05 [S]
-      Key fingerprint = 6B97 B196 A737 0899 334C  31C8 163C 4916 4205 570A
+      Key fingerprint = xxxx xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx xxxx
 uid         [ultimate] misc_name <misc_name.arch@gmail.com>
-sub   rsa2048/C6031D30 2016-03-05 []
+sub   rsa2048/xxxxxxxx 2016-03-05 []
 
 
 --- Check lists ---

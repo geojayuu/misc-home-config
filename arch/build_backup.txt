@@ -1,0 +1,79 @@
+Backup the important folders
+to dropbox
+/etc
+/home
+/var
+
+systemd scheduling
+?
+
+Various backup options...
+https://wiki.archlinux.org/index.php/Synchronization_and_backup_programs
+
+Dropbox:
+https://wiki.archlinux.org/index.php/Dropbox
+Starting Dropbox as a service
+systemctl start <dropbox?>
+
+Limit to a specific directory (Selective Sync)
+https://www.dropbox.com/help/175
+
+Went with Google Drive in the end:
+https://github.com/odeke-em/drive
+
+drive init ~/gdrive
+
+Then went with rclone
+http://rclone.org/
+
+Use rsync to backup etc, var, home
+Incrementatl backups
+Wrap changes around the drive push command to only backup changes.
+https://wiki.archlinux.org/index.php/full_system_backup_with_rsync
+Run x2 commands to sync then remove...
+sudo rsync -aAXv --exclude-from='/home/user/rsync_exclude.txt' --progress /home/user/ ~/gdrive/arch_backup/home/user/
+sudo rsync --delete -aAXv --exclude-from='/home/user/rsync_exclude.txt' --progress /home/user/ ~/gd_remote/arch_backup/home/user/
+-- lot of stuff in home...
+-- all i need is build_repos, and even then only the package...
+sudo rsync -aAXv --progress /var/ ~/gdrive/arch_backup/var/
+sudo rsync -aAXv --progress /etc/ ~/gdrive/arch_backup/etc/
+
+::Once the internal rsync has been done use the rclone commands to sync to Google Drive::
+http://rclone.org/drive/
+OK
+Can set up and operate from the command line.
+
+tar and encrypt (bzip2)
+gpg for encryption.
+http://unix.stackexchange.com/questions/144391/encrypting-and-compressing
+bzip2 	- installed
+gpg 	- installed
+
+Comments about backing up
+https://bbs.archlinux.org/viewtopic.php?id=203319
+
+
+----------
+
+Backup the pacman packages
+https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks#Backing_up_and_retrieving_a_list_of_installed_packages
+$ pacman -Qqen > pkglist.txt
+Save on removable media or Dropbox
+Restore
+# pacman -S $(< pkglist.txt)
+
+For checking suspected corrupt packages - see the same help
+
+Backup the pacman databases
+https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks#Back-up_the_pacman_database
+Save on removable media or Dropbox
+$ tar -cjf pacman_database.tar.bz2 /var/lib/pacman/local
+Restore
+# tar -xjvf pacman_database.tar.bz2
+Alternative method using systemd - see help
+
+# backup to sd card
+mkfs.ext4 /dev/sdb (sd card)
+mount it
+[user@arch ~]$ sudo rsync -naAXic --delete --exlude-from='/home/user/rsync_exclude.txt' / /mnt/32gb
+

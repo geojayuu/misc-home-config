@@ -1,0 +1,44 @@
+https://wiki.archlinux.org/index.php/git
+https://help.github.com/articles/setting-your-email-in-git/
+
+Test ssh works in git hub - after setting up private/public key
+https://developer.github.com/guides/using-ssh-agent-forwarding/
+
+Where setting up the repository - which you have to do on github???
+Possibly
+http://stackoverflow.com/questions/2423777/is-it-possible-to-create-a-remote-repo-on-github-from-the-cli-without-ssh
+See second answer.
+Use Curl and the developer API.
+
+curl -u 'USER' https://api.github.com/user/repos -d '{"name":"REPO"}'
+    Replace USER and REPO with relevant details.
+Then create the repo locally
+Then create some files
+Then commit and push to master - create the repo and log onto github to see
+the commands
+
+[user@arch test_repo]$ echo '# test repo' >> README.md
+[user@arch test_repo]$ git init
+Initialized empty Git repository in /home/user/git/test_repo/.git/
+[user@arch test_repo]$ git add README.md 
+[user@arch test_repo]$ git commit -m "first commit"
+[master (root-commit) a049fd2] first commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+[user@arch test_repo]$ git remote add origin git@github.com:geomisc_user/test_repo.git
+[user@arch test_repo]$ git push -u origin master
+    which fucking password?
+
+Via GitHub
+The default script for manually creating the repo uses the 'https' rather than 'ssh' address. So then if you try to commit you will be prompted for a user/pass.
+ie.
+git remote add origin https://github.com/geomisc_user/misc-home-config.git
+to correct:
+git remote set-url origin git@github.com:username/repo.git
+
+http://stackoverflow.com/questions/6565357/git-push-requires-username-and-password
+
+to check what it's connected with
+git remote -v
+
+

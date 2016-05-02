@@ -1,0 +1,29 @@
+wifi-menu
+- set up the service
+- enable/start etc. using netclt
+
+drive mount
+- create a service in /etc/systemd/system
+    mnt-32gb.mount
+
+----
+[Unit]
+Description = microSD backup
+
+[Mount]
+What = /dev/sdb
+Where = /mnt/32gb
+Type = ext4
+
+[Install]
+WantedBy = multi-user.target
+----
+
+Need to know the device id/name of the drive - should be in the file name.
+- Create the file
+- systemctl start mnt-32gb.mount
+- systemctl enable mnt-32gb.mount
+- systemctl status mnt-32gb.mount
+etc.
+
+Ugh - read Google and try mounting another SDcard.

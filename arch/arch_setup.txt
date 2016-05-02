@@ -1,0 +1,241 @@
+Read the Arch install guides
+https://wiki.archlinux.org/index.php/installation_guide
+https://wiki.archlinux.org/index.php/Beginners'_guide
+
+From the bootable usb
+Drives
+[user@jarch ~]$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0 232.9G  0 disk 
+├─sda1   8:1    0    20G  0 part /
+├─sda2   8:2    0   300M  0 part /boot
+├─sda3   8:3    0     3G  0 part [SWAP]
+├─sda4   8:4    0     1K  0 part 
+├─sda5   8:5    0    12G  0 part /var
+└─sda6   8:6    0   190G  0 part /home
+
+Define the format for each partition
+mkfs.ext4 /dev/sda1
+etc.
+
+Set the swap
+mkswap /dev/sda3
+swapon /dev/sda3
+
+Mount the drives
+1st. 
+mount /dev/sda1 /mnt
+mkdir /mnt/boot
+mkdir /mnt/home
+mkdir /mnt/var
+mount /dev/sda2 /mnt/boot
+mount /dev/sda5 /mnt/var
+mount /dev/sda5 /mnt/home
+
+Sort out the mirrors
+https://wiki.archlinux.org/index.php/Mirrors
+	rankmirrors
+
+::Install::
+pacstrap /mnt base
+
+
+Set fstab
+	genfstab -R /mnt >> /etc/ ??
+Set up locale; time
+	... see instructions
+
+
+Change root...
+arch-chroot /mnt /bin/bash
+
+install VIM
+
+Locale
+l 	
+Timezone
+	tzselect
+	run again as 'user' - read the messages
+
+Install GRUB...
+pacman -S grub
+grub-install /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg (even though grub-install made one...)
+
+set hostname
+echo arch > /etc/hostname
+
+set root password
+passwd
+
+Exit Chroot
+
+Unmount drives
+	umount -R /mnt
+
+Reboot.
+
+:Wifi
+pacman -S iw wpa_supplicant dialog
+wifi-menu
+netctl -h (start service) so begins automatically.
+
+Set up another account
+	useradd -m -G wheel -s /bin/bash user	
+
+Install sudo
+pacmap -S sudo
+
+Add to sudo group 
+	visudo
+
+Disable root login
+	make sure other account has sudo rights first!
+	passwd -l root (lock)
+	passwd -u root (unlock)
+
+# Enable messages in grub
+https://wiki.archlinux.org/index.php/Disable_clearing_of_boot_messages
+(have to be root)
+Edit /etc/default/grub 
+	not 'quiet'
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# Locale
+localectl set-locale LANG=en_GB.UTF-8
+Keymaps /etc/vconsole.conf
+KEYMAP=uk
+localectl status
+
+: Pacman tips and tricks
+	https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks
+pacman -Syy (update)
+pacman -Syu (?)
+
+pacman -S vim
+pacman -S base
+pacman -S base-devel (for UAR)
+	https://wiki.archlinux.org/index.php/Arch_User_Repository
+pacman -S git
+	Get via git - if package is available
+	makepkg -sri (-h for help)
+
+:?Manager
+pacman -S xorg-server
+pacman -S xory-server-utils
+
+
+Drivers...
+:https://wiki.archlinux.org/index.php/Xorg#Driver_installation
+
+Intel driver - to launch screen
+pacman -S xf86-video-intel
+
+:Trackpad Driver (required for eeepc)
+(1st time lxqt was loading but mouse + keyboard unresponsive)
+pacman -S xf86-input-synaptics
+	cp /usr/share/X11/xorg.conf.d/50-synaptics.conf /etc/X11/xorg.conf.d/.  (didn't do this second time around)
+or not?
+
+Sounds???
+
+
+
+:?
+pacman -S openbox
+
+:Desktop
+pacman -S lxqt
+pacman -S oxgen-icons
+pacman -S firefox
+
+:lxqt specific packages
+install from user account - not root
+	~/build-git
+git clone https://aur.archlinux.org/qtermwidget-git
+git clone https://aur.archlinux.org/qterminal-git
+	or get the package via curl.
+
+
+Install ~/.xinitrc
+pacman -S xorg-xinit 
+- Configure xinitrc
+cp /etc/X11/xinit/xinitrc ~/.xinitrc
+
+:Windows Manager
+ pacman -S 
+
+# 2016.02.29
+
+# Brightness
+Checked the brightness - keys are corking...
+[user@arch history_setup]$ cat /sys/class/backlight/acpi_video0/max_brightness 
+[user@arch history_setup]$ sudo tee /sys/class/backlight/acpi_video0/brightness <<< 5
+
+# Sound
+https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture
+[user@arch history_setup]$ sudo pacman -S alsa-utils
+[user@arch history_setup]$ amixer sset Master unmute
+[user@arch history_setup]$ alsamixer
+[user@arch history_setup]$ speaker-test -c 2
+
+More info.
+https://wiki.archlinux.org/index.php/sound_system
+
+Keys don't work...
+
+lxqt - themes
+instll obconfqt
+
+Reading around system maintenance
+https://wiki.archlinux.org/index.php/System_maintenance
+
+# Monitor battery
+https://wiki.archlinux.org/index.php/ACPI_modules
+
+[user@arch history_setup]$ ls -l /usr/lib/modules/$(uname -r)/kernel/drivers/acpi
+gives list of modules for this kernel?
+$ modprobe battery
+$ dmesg | grep acpi
+
+add the working ones to configuration files in /etc/modules-load.d
+see man modules-load-d
+
+...didn't do this...
+
+$ upower -d (dump)
+gives battery information on the eeepc 
+
+install acpi
+https://wiki.archlinux.org/index.php/Laptop#Power_management
+    link has good info. about other information.
+    ie. Hibernate 
+
+acpi -V 
+    gives all the info. battery; temp
+
+Running commands requiring sudo without prompting for password every time:
+http://askubuntu.com/questions/155791/how-do-i-sudo-a-command-in-a-script-without-being-asked-for-a-password
+
+
+::w3m
+
+change to startx to incude 'case' ie. pass param to startx
+    startx xterm
+    startx startlxqt
+
+w3m runs quite nicely in xterm + image support + white bg..
+    is this pointless?
+    Could be more lighweight than running a full desktop env.
+    https://www.namhuy.net/3218/browse-web-in-linux-via-terminal-with-w3m-and-xterm.html
+
+:: More startx
+Using CASE ... ESAC with .xinit - use $2
+https://bbs.archlinux.org/viewtopic.php?id=209252
+
+:: Password manager (not keepass)
+man pass
+pass ls
+pass show -c (clipboard for 45 seconds)
+Setup a second gpg key to use with pass.
+

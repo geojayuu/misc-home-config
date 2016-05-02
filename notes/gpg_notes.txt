@@ -1,0 +1,134 @@
+Web resources
+http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
+
+
+My notes.
+
+Create encryptthis.txt
+
+[user@arch ~]$ gpg -c encryptthis.txt 
+- should prompt for a password (x2)
+- then encypts the file.
+
+
+::Key Pairs::
+
+Public key - can sit in a public location and be used to encrypt.
+Private key - used to decrypt files encrypted with the Public key.
+
+To create the Public/Private key pair.
+gpg --gen-key
+
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+
+gpg: key 4205570A marked as ultimately trusted
+gpg: directory '/home/user/.gnupg/openpgp-revocs.d' created
+gpg: revocation certificate stored as '/home/user/.gnupg/openpgp-revocs.d/6B97B196A7370899334C31C8163C49164205570A.rev'
+public and secret key created and signed.
+
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: PGP
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pub   rsa2048/4205570A 2016-03-05 [S]
+      Key fingerprint = 6B97 B196 A737 0899 334C  31C8 163C 4916 4205 570A
+uid         [ultimate] misc_name <misc_name.arch@gmail.com>
+sub   rsa2048/C6031D30 2016-03-05 []
+
+
+--- Check lists ---
+gpg --list-keys
+gpg --list-secret-keys
+
+--- Export a public key ---
+gpg --export -a "User Name" > public.key
+gpg --export-secret-key -a "User Name" > private.key
+
+--- Import 
+gpg --import public.key
+
+-- Fingerprint
+gpg fingerprint 
+
+....
+
+Use rsync to keep track of the changes.
+Can recursively determine all files.
+	find . <dirname>
+so can recursively determine all .gpg files.
+
+[user@arch gpgtest]$ find . -type f -exec gpg -e -r misc_name {} \;
+to remove all .gpg files
+[user@arch gpgtest]$ find . -name "*.gpg" -exec rm {} \;
+
+Before transferring could pass through bzip2
+http://www.linfo.org/bzip2.html
+
+Now can't use rsync --delete
+Could remove all .gpg files - bit of an overhead though.
+- could also ignore all *.gpg files via --exclude...
+- need to capture all changes and re-encrypt.
+
+rclone only gpg files
+http://rclone.org/filtering/
+rclone copy --inlcude *.{gpg} <source> <remote:dir>
+  include also has implcit exclude *.{*}
+
+: To get a list of changes
+[user@arch gpgtest]$ sudo rsync -naic --delete --exclude-from='./rsync_exclude.txt' --itemize-changes /home/user/gpgtest/ ~/4gdrive/arch_backup/test/ | grep "*deleting"
+
+[user@arch gpgtest]$ find ~/4gdrive/arch_backup/test/ -name "secret.txt*"
+
+-- Delete flag does it all in one...
+[user@arch gpgtest]$ sudo rsync -aAXvn --delete --exclude-from='./rsync_exclude.txt' /home/user/gpgtest/ ~/4gdrive/arch_backup/test/
+
+To get the list: 
+-n dry-run
+-c checksum
+-i itemize changes
+
+[user@arch gpgtest]$ sudo rsync -naic --delete --exclude-from='./rsync_exclude.txt' /home/user/gpgtest/ ~/4gdrive/arch_backup/test/
+*deleting   secret2.txt
+.d..t...... ./
+>fcst...... secret.txt
+
+More...
+[user@arch ~]$ sudo rsync -naAXic --delete /var/ ~/4gdrive/arch_backup/var/
+.d..t...... lib/upower/
+>fcst...... lib/upower/history-charge-1015PE-56.dat
+>fcst...... lib/upower/history-rate-1015PE-56.dat
+>fcst...... lib/upower/history-time-empty-1015PE-56.dat
+>fcst...... lib/upower/history-time-full-1015PE-56.dat
+>fc.t...... log/journal/31d1d4c7862041a1b75bc6e41c1d7569/system.journal
+>fc.t...... log/journal/31d1d4c7862041a1b75bc6e41c1d7569/user-1000.journal
+.d..t...... tmp/
+
+Breakdown of the codes
+https://www.samba.org/ftp/rsync/rsync.html
+
+# 2016.03.04 - Last command
+sudo rsync -naAXc --out-format='%n' --delete --exclude-from='/home/user/gpgtest/rsync_exclude.txt' ~/gpgtest/ ~/4gdrive/arch_backup/test/
+
+Gives a list of dir + files
+Add to a list 
+Check whether a dir and ignore
+If a file then find and remove relevant file + gpg file 
+Rerun rsync command (files move)
+Encrypt the new file
+rclone to cloud server
+
+# 2016.03.11
+
+# Prepare the file
+sudo rsync -naAXc --out-format='%n' --delete --exclude-from='/home/user/gpgtest/rsync_exclude.txt' ~/gpgtest/ ~/4gdrive/arch_backup/test/ > test_changes.txt
+
+# Parse the file. File must relate to the specific directory
+python address_changes.py -f ./test_changes.txt -d "/home/user/4gdrive/arch_backup/test"
+
+-- different log format:
+sudo rsync -naAXic --delete --exclude-from='/home/user/gpgtest/rsync_exclude.txt' ~/gpgtest/ ~/4gdrive/arch_backup/test/
+
+:Capture permissions
+http://www.linuxdevcenter.com/pub/a/linux/excerpt/lsckbk_chap1/index1.html?page=2

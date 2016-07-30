@@ -1,0 +1,120 @@
+centos
+
+”I will configure paritioning”
+
+Parition
+/boot	512MiB 	separate	xfs
+swap	12GiB	LVM		swap
+/	20GiB	LVM		xfs
+/var	20GiB	LVM		xfs
+/home	rest	LVM		xfs
+
+
+Add account manually (to wheel to get sudo)
+	useradd -m -G wheel -s /bin/bash juu
+
+
+Add windows to GRUB
+Need to know the relevant windows partition
+	sudo vim /etc/grub.d/40_custom
+	menuentry “Windows 7” {
+	  set root=‘(hd0,1)’ 		<< check this
+	  chainloader +1
+	}
+
+set up wifi network
+
+nmcli d
+nmtui (Activate a connection)
+
+# 30 things to do on Centos Minimal install
+# http://www.tecmint.com/things-to-do-after-minimal-rhel-centos-7-installation/2/
+
+yum update && yum upgrade
+
+yum install links (cmd browser)
+
+yum install vim
+
+yum search ifconfig
+yum install net-tools
+
+#install apache or nginx ?
+
+#install MariaDB (fork or MySQL) ?
+
+
+ssh -V
+vi /etc/ssh/ssh_config
+
+Default anyway - no Protocol 1; no root access
+
+yum install nmap
+
+check firewall settings (see web-page)
+firewall-cmd <various options>
+	see for more information on adding services ie.
+	firewall-cmd —add-service=http
+	firewall-cmd -reload
+	… and information about removing the service.
+	… and permit access to ports
+
+yum install wget
+
+yum install telnet
+
+#webmin - web based config tool for Linux. HTTP server, Apache, MySQL
+
+add extra packages
+yum install epel-release
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+(http://elrepo.org/tiki/tiki-index.php)
+
+yum install p7zip
+
+#yum install ntfs-3g
+(mount and access Windows NTFS file system)
+
+#yum install vsftpd
+(very secure file transfer protocol daemon)
+
+yum install selinux-policy (Security-Enhanced Linux)
+(already installed message)
+check with getenforce 
+- can unenforce for debugging (setenforce 0)
+
+yum install rkhunter
+rkhunter —-check
+
+
+#owncloud
+#virtualbox
+#password protect grub
+
+
+Put every thing you want in a file..
+yum -y install $(cat <file_name>)
+
+
+yum -y groups install “GNOME Desktop” - INSTALLS about 1000 packages.
+
+alt.
+
+yum groupinstall “X Window System”
+yum install gnome-classic-session gnome-terminal nautilus-open-terminal control-center liberation-mono-fonts
+unlink /etc/systemd/system/default.target
+(default is /usr/lib/systemd/multi-user.target )
+ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target
+
+
+
+Touch pad
+
+Scroll works 	(otb)
+Click does not work
+
+synclient | grep TapButton
+TapButton1 = 0
+synclient TapButton1=1
+
+

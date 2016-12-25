@@ -1,0 +1,22 @@
+Get arm distro from here:
+https://archlinuxarm.org/about/downloads
+
+Follow instructions to prepare an sd card
+https://archlinuxarm.org/platforms/armv6/raspberry-pi
+
+pacman
+upgrade system
+add python
+add sudo
+add vim
+add screen
+
+add new user 
+add new user to wheel group in visudo
+
+disable ssh for root and alarm accounts
+
+Set up Time Zone if necessary
+- See the Arch install notes
+
+Create Python virtual environment
